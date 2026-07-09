@@ -77,4 +77,18 @@ describe("Tevm state helpers", () => {
 
     await expect(readStorageSlot(tevm, slot)).resolves.toBe(toHex(1n, { size: 32 }));
   });
+
+  it("keeps snapshot working when destructured off the state object", async () => {
+    const tevm = createMemoryClient({ miningConfig: { type: "auto" } });
+    await tevm.tevmReady();
+    const { snapshot, setStorageSlot: setSlot } = createFhevmTevmState(tevm);
+    const slot = toHex(2n, { size: 32 });
+
+    await setSlot(contractAddress, slot, toHex(1n, { size: 32 }));
+    const restorePoint = await snapshot();
+    await setSlot(contractAddress, slot, toHex(2n, { size: 32 }));
+    await restorePoint.restore();
+
+    await expect(readStorageSlot(tevm, slot)).resolves.toBe(toHex(1n, { size: 32 }));
+  });
 });

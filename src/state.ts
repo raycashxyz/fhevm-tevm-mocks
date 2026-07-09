@@ -143,51 +143,56 @@ export const setOwnableStorage = async (
   await setStorageSlot(tevm, contractAddress, storageLocation, padHex(ownerAddress, { size: 32 }));
 };
 
-export const createFhevmTevmState = (tevm: TevmStateClient): FhevmTevmState => ({
-  async setBalance(address, amount) {
-    const result = await tevm.tevmDeal({ account: address, amount });
-    assertNoTevmErrors(result);
-  },
-  async deal(params) {
-    const result = await tevm.tevmDeal(params);
-    assertNoTevmErrors(result);
-  },
-  async mine(params) {
-    const result = await tevm.tevmMine(params);
-    assertNoTevmErrors(result);
-  },
-  async setAccount(params) {
-    const result = await tevm.tevmSetAccount(params);
-    assertNoTevmErrors(result);
-  },
-  async setCode(address, deployedBytecode) {
-    await setAccountCode(tevm, address, deployedBytecode);
-  },
-  async setStorageSlot(address, slot, value) {
-    await setStorageSlot(tevm, address, slot, value);
-  },
-  async setInitializableStorage(contractAddress, value) {
-    await setInitializableStorage(tevm, contractAddress, value);
-  },
-  async setOwnableStorage(contractAddress, ownerAddress) {
-    await setOwnableStorage(tevm, contractAddress, ownerAddress);
-  },
-  async dumpState() {
+export const createFhevmTevmState = (tevm: TevmStateClient): FhevmTevmState => {
+  const dumpState = async (): Promise<SerializableTevmState> => {
     const result = await tevm.tevmDumpState();
     assertNoTevmErrors(result);
     return result.state;
-  },
-  async loadState(state) {
+  };
+  const loadState = async (state: SerializableTevmState): Promise<void> => {
     const result = await tevm.tevmLoadState({ state });
     assertNoTevmErrors(result);
-  },
-  async snapshot() {
-    const state = await this.dumpState();
-    return {
-      state,
-      restore: async () => {
-        await this.loadState(state);
-      },
-    };
-  },
-});
+  };
+
+  return {
+    async setBalance(address, amount) {
+      const result = await tevm.tevmDeal({ account: address, amount });
+      assertNoTevmErrors(result);
+    },
+    async deal(params) {
+      const result = await tevm.tevmDeal(params);
+      assertNoTevmErrors(result);
+    },
+    async mine(params) {
+      const result = await tevm.tevmMine(params);
+      assertNoTevmErrors(result);
+    },
+    async setAccount(params) {
+      const result = await tevm.tevmSetAccount(params);
+      assertNoTevmErrors(result);
+    },
+    async setCode(address, deployedBytecode) {
+      await setAccountCode(tevm, address, deployedBytecode);
+    },
+    async setStorageSlot(address, slot, value) {
+      await setStorageSlot(tevm, address, slot, value);
+    },
+    async setInitializableStorage(contractAddress, value) {
+      await setInitializableStorage(tevm, contractAddress, value);
+    },
+    async setOwnableStorage(contractAddress, ownerAddress) {
+      await setOwnableStorage(tevm, contractAddress, ownerAddress);
+    },
+    dumpState,
+    loadState,
+    async snapshot() {
+      const state = await dumpState();
+      return {
+        state,
+        restore: async () => {
+          await loadState(state);
+        },
+      };
+    },
+  };
+};
