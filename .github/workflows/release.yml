@@ -29,20 +29,9 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
-      - name: Prepare npm for OIDC trusted publishing
-        run: |
-          # setup-node writes a placeholder _authToken when registry-url is set; strip it so npm
-          # falls back to GitHub OIDC trusted publishing instead of an empty token.
-          if [ -f "$HOME/.npmrc" ]; then
-            sed -i '/^\/\/registry\.npmjs\.org\/:_authToken=/d' "$HOME/.npmrc"
-          fi
       - uses: changesets/action@v1
         with:
           publish: npm publish --access public
           version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ""
-      - name: Verify npm publish
-        if: failure()
-        run: npm view fhevm-tevm-mocks version || true
