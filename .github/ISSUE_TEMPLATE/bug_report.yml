@@ -1,0 +1,57 @@
+name: Bug report
+description: Something isn't working as documented
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Include versions and a minimal repro if you can — it speeds up fixes a lot.
+
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      description: Output of `npm ls fhevm-tevm-mocks`
+      placeholder: e.g. fhevm-tevm-mocks@0.4.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: What did you expect, and what actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal script or repo link
+      placeholder: |
+        1. createFhevmTevmRuntime(tevm) with …
+        2. …
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Node, viem, and tevm versions, OS
+      placeholder: |
+        - Node: 22.x
+        - viem: 2.44.2
+        - tevm: 1.0.0-next.149
+        - OS: macOS
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / stack trace
+      description: Paste relevant terminal output inside a fenced code block. Redact tokens, credentials, and other secrets.
+      render: shell

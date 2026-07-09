@@ -31,7 +31,7 @@ jobs:
       - run: pnpm build
       - uses: changesets/action@v1
         with:
-          publish: npm publish --access public
+          publish: pnpm release
           version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
